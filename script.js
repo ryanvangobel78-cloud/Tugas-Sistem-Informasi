@@ -1,4 +1,19 @@
-// Data struktur
+// ============================================================
+// E-LEARNING KELAS C MANAJEMEN PENDIDIKAN
+// Firebase Integration Script
+// ============================================================
+// 
+// CATATAN: File ini TIDAK PERLU DIGANTI APAPUN!
+// Config Firebase ada di file index.html
+//
+// ============================================================
+
+console.log("🚀 Loading firebase-script.js...");
+
+// ============================================================
+// DATA STRUKTUR
+// ============================================================
+
 const mataKuliah = [
     "Penelitian Kuantitatif",
     "Manajemen Berbasis Sekolah",
@@ -10,135 +25,223 @@ const mataKuliah = [
     "Manajemen Kearsipan"
 ];
 
+// Global variables
 let currentUser = "";
 let currentUserRole = "";
 let currentMatkulIndex = -1;
+let db = null;
+let firestoreModules = null;
 
-// Wait for Firebase to be ready
+// ============================================================
+// WAIT FOR FIREBASE TO BE READY
+// ============================================================
+
 function waitForFirebase() {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
+        console.log("⏳ Waiting for Firebase to initialize...");
+        
+        let attempts = 0;
+        const maxAttempts = 100; // 10 detik (100 x 100ms)
+        
         const checkFirebase = setInterval(() => {
+            attempts++;
+            
             if (window.db && window.firestoreModules) {
+                db = window.db;
+                firestoreModules = window.firestoreModules;
                 clearInterval(checkFirebase);
+                console.log("✅ Firebase is ready!");
+                console.log("📊 Database:", db);
                 resolve();
+            }
+            
+            if (attempts >= maxAttempts) {
+                clearInterval(checkFirebase);
+                console.error("❌ Firebase initialization timeout!");
+                reject(new Error("Firebase gagal diinisialisasi"));
             }
         }, 100);
     });
 }
 
-// Login Function
+// ============================================================
+// LOGIN FUNCTION
+// ============================================================
+
 async function login() {
+    console.log("🔐 Login attempt started...");
+    
     const nim = document.getElementById('nim').value;
     const password = document.getElementById('password').value;
     const errorMessage = document.getElementById('errorMessage');
     const loginBtn = document.getElementById('loginBtn');
 
+    // Reset error message
+    errorMessage.style.display = "none";
+
+    // Validasi input
     if (!nim) {
-        errorMessage.textContent = "Silakan pilih NIM terlebih dahulu!";
+        errorMessage.textContent = "❌ Silakan pilih NIM terlebih dahulu!";
         errorMessage.style.display = "block";
+        console.warn("⚠️ NIM kosong");
         return;
     }
 
     if (!password) {
-        errorMessage.textContent = "Silakan masukkan password!";
+        errorMessage.textContent = "❌ Silakan masukkan password!";
         errorMessage.style.display = "block";
+        console.warn("⚠️ Password kosong");
         return;
     }
 
     if (password !== "12345678") {
-        errorMessage.textContent = "Password salah!";
+        errorMessage.textContent = "❌ Password salah!";
         errorMessage.style.display = "block";
+        console.warn("⚠️ Password tidak cocok");
         return;
     }
 
     try {
+        // Disable button
         loginBtn.disabled = true;
-        loginBtn.textContent = "Memproses...";
+        loginBtn.textContent = "⏳ Memproses...";
+        console.log("🔄 Processing login for NIM:", nim);
 
-        // Wait for Firebase to be ready
+        // Wait for Firebase
         await waitForFirebase();
 
         // Get Firestore modules
-        const { doc, getDoc, setDoc } = window.firestoreModules;
-        const userRef = doc(window.db, "users", nim);
+        const { doc, getDoc, setDoc } = firestoreModules;
+        
+        console.log("📡 Connecting to Firestore...");
+        
+        // Check if user exists
+        const userRef = doc(db, "users", nim);
+        console.log("🔍 Checking user document:", nim);
+        
         const userSnap = await getDoc(userRef);
 
         if (!userSnap.exists()) {
+            console.log("👤 User not found, creating new user...");
+            
             // Create new user
             const role = nim === "131424090" ? "admin" : "student";
-            await setDoc(userRef, {
+            const newUser = {
                 nim: nim,
                 role: role,
                 readStatus: {},
-                createdAt: new Date()
-            });
+                createdAt: new Date(),
+                lastLogin: new Date()
+            };
+            
+            await setDoc(userRef, newUser);
             currentUserRole = role;
-            console.log("✅ User baru dibuat:", nim, "Role:", role);
+            
+            console.log("✅ New user created:", newUser);
         } else {
+            // User exists, update last login
             currentUserRole = userSnap.data().role;
-            console.log("✅ User login:", nim, "Role:", currentUserRole);
+            
+            await setDoc(userRef, {
+                lastLogin: new Date()
+            }, { merge: true });
+            
+            console.log("✅ User login:", nim, "| Role:", currentUserRole);
         }
 
+        // Set current user
         currentUser = nim;
         errorMessage.style.display = "none";
+        
+        // Show dashboard
         await showDashboard();
+        
+        console.log("🎉 Login successful!");
 
     } catch (error) {
-        console.error("❌ Error login:", error);
-        errorMessage.textContent = "Terjadi kesalahan! " + error.message;
+        console.error("❌ Error during login:", error);
+        errorMessage.textContent = "❌ Terjadi kesalahan: " + error.message;
         errorMessage.style.display = "block";
+        
+        // Show detailed error in console
+        console.error("Error details:", {
+            message: error.message,
+            code: error.code,
+            stack: error.stack
+        });
     } finally {
         loginBtn.disabled = false;
         loginBtn.textContent = "Masuk";
     }
 }
 
-// Show Dashboard
+// ============================================================
+// SHOW DASHBOARD
+// ============================================================
+
 async function showDashboard() {
+    console.log("📊 Showing dashboard...");
+    
+    // Hide login page
     document.getElementById('loginPage').style.display = "none";
     document.getElementById('dashboardPage').style.display = "block";
+    
+    // Set user info
     document.getElementById('userNim').textContent = currentUser;
 
     // Check if admin
     if (currentUserRole === "admin") {
         document.getElementById('adminPanel').style.display = "block";
         document.getElementById('adminBadge').innerHTML = '<span class="badge-admin">👑 ADMIN</span>';
-        console.log("✅ Panel admin ditampilkan");
+        console.log("✅ Admin panel enabled");
     } else {
         document.getElementById('adminPanel').style.display = "none";
         document.getElementById('adminBadge').innerHTML = '';
-        console.log("✅ Login sebagai student");
+        console.log("✅ Student mode");
     }
 
+    // Load materials
     await loadMaterials();
 }
 
-// Load Materials from Firestore
+// ============================================================
+// LOAD MATERIALS FROM FIRESTORE
+// ============================================================
+
 async function loadMaterials() {
+    console.log("📚 Loading materials...");
+    
     try {
+        // Show loading
         document.getElementById('loadingTable').style.display = "block";
         document.getElementById('materiTableContainer').style.display = "none";
 
-        const { doc, getDoc } = window.firestoreModules;
+        const { doc, getDoc } = firestoreModules;
         const tbody = document.getElementById('materiTable');
         tbody.innerHTML = '';
 
         // Get user's read status
-        const userRef = doc(window.db, "users", currentUser);
+        const userRef = doc(db, "users", currentUser);
         const userSnap = await getDoc(userRef);
         const readStatus = userSnap.exists() ? (userSnap.data().readStatus || {}) : {};
 
-        console.log("📖 Read status:", readStatus);
+        console.log("📖 Read status loaded:", readStatus);
 
-        // Load all materials
+        // Load each material
         for (let index = 0; index < mataKuliah.length; index++) {
-            const matkulRef = doc(window.db, "materials", index.toString());
+            const matkulRef = doc(db, "materials", index.toString());
             const matkulSnap = await getDoc(matkulRef);
             
-            const data = matkulSnap.exists() ? matkulSnap.data() : { materi: "", tugas: "", deadline: null };
-            const isRead = readStatus[index] === true;
+            const data = matkulSnap.exists() ? matkulSnap.data() : {
+                materi: "",
+                tugas: "",
+                deadline: null
+            };
+            
+            const isRead = readStatus[index.toString()] === true;
             const readClass = isRead ? 'read' : '';
 
+            // Create table row
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${index + 1}</td>
@@ -166,8 +269,10 @@ async function loadMaterials() {
             tbody.appendChild(row);
         }
 
+        // Hide loading
         document.getElementById('loadingTable').style.display = "none";
         document.getElementById('materiTableContainer').style.display = "table";
+        
         console.log("✅ Materials loaded successfully");
 
     } catch (error) {
@@ -177,7 +282,10 @@ async function loadMaterials() {
     }
 }
 
-// Format Date
+// ============================================================
+// FORMAT DATE
+// ============================================================
+
 function formatDate(timestamp) {
     if (!timestamp) return '-';
     
@@ -197,13 +305,20 @@ function formatDate(timestamp) {
             date = new Date(timestamp);
         }
         
+        // Check if date is valid
+        if (isNaN(date.getTime())) {
+            return '-';
+        }
+        
         const options = { 
             year: 'numeric', 
             month: 'long', 
             day: 'numeric', 
             hour: '2-digit', 
-            minute: '2-digit' 
+            minute: '2-digit',
+            timeZone: 'Asia/Jakarta'
         };
+        
         return date.toLocaleDateString('id-ID', options);
     } catch (error) {
         console.error("Error formatting date:", error);
@@ -211,10 +326,16 @@ function formatDate(timestamp) {
     }
 }
 
-// Save Material (Admin Only)
+// ============================================================
+// SAVE MATERIAL (ADMIN ONLY)
+// ============================================================
+
 async function saveMateri() {
+    console.log("💾 Saving material...");
+    
     if (currentUserRole !== "admin") {
         alert("❌ Anda tidak memiliki akses admin!");
+        console.warn("⚠️ Non-admin tried to save material");
         return;
     }
 
@@ -224,6 +345,7 @@ async function saveMateri() {
     const deadlineInput = document.getElementById('deadline').value;
     const saveBtn = document.getElementById('saveBtn');
 
+    // Validation
     if (matkulIndex === "") {
         alert('❌ Silakan pilih mata kuliah terlebih dahulu!');
         return;
@@ -236,10 +358,17 @@ async function saveMateri() {
 
     try {
         saveBtn.disabled = true;
-        saveBtn.textContent = "Menyimpan...";
+        saveBtn.textContent = "⏳ Menyimpan...";
+        
+        console.log("📝 Saving to Firestore...", {
+            matkulIndex,
+            materi: materi.substring(0, 50) + "...",
+            tugas: tugas.substring(0, 50) + "...",
+            deadline: deadlineInput
+        });
 
-        const { doc, setDoc, getDoc } = window.firestoreModules;
-        const matkulRef = doc(window.db, "materials", matkulIndex);
+        const { doc, setDoc, getDoc } = firestoreModules;
+        const matkulRef = doc(db, "materials", matkulIndex);
         
         // Get existing data
         const matkulSnap = await getDoc(matkulRef);
@@ -251,13 +380,14 @@ async function saveMateri() {
             materi: materi || existingData.materi || "",
             tugas: tugas || existingData.tugas || "",
             deadline: deadlineInput ? new Date(deadlineInput) : (existingData.deadline || null),
-            updatedAt: new Date()
+            updatedAt: new Date(),
+            updatedBy: currentUser
         };
 
         // Save to Firestore
         await setDoc(matkulRef, updateData, { merge: true });
 
-        console.log("✅ Data saved:", updateData);
+        console.log("✅ Data saved successfully:", updateData);
 
         // Reset form
         document.getElementById('materiContent').value = '';
@@ -266,6 +396,8 @@ async function saveMateri() {
         document.getElementById('selectMatkul').value = '';
 
         alert('✅ Data berhasil disimpan!');
+        
+        // Reload materials
         await loadMaterials();
 
     } catch (error) {
@@ -277,33 +409,42 @@ async function saveMateri() {
     }
 }
 
-// View Material
+// ============================================================
+// VIEW MATERIAL
+// ============================================================
+
 async function viewMateri(index) {
+    console.log("👁️ Viewing material:", mataKuliah[index]);
+    
     try {
-        const { doc, getDoc, updateDoc } = window.firestoreModules;
-        const matkulRef = doc(window.db, "materials", index.toString());
+        const { doc, getDoc } = firestoreModules;
+        const matkulRef = doc(db, "materials", index.toString());
         const matkulSnap = await getDoc(matkulRef);
 
         if (!matkulSnap.exists() || !matkulSnap.data().materi) {
             alert('❌ Materi belum tersedia');
+            console.warn("⚠️ Material not found for index:", index);
             return;
         }
 
         const data = matkulSnap.data();
+        
+        // Set modal content
         document.getElementById('modalTitle').textContent = mataKuliah[index];
         
-        // Display material content
         const materiContent = data.materi.replace(/\n/g, '<br>');
         document.getElementById('modalContent').innerHTML = `
             <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid #667eea;">
                 ${materiContent}
             </div>
         `;
+        
+        // Show modal
         document.getElementById('materiModal').style.display = 'block';
 
-        console.log("✅ Viewing material:", mataKuliah[index]);
+        console.log("✅ Material displayed");
 
-        // Mark as read in Firestore
+        // Mark as read
         await markAsRead(index);
 
     } catch (error) {
@@ -312,11 +453,16 @@ async function viewMateri(index) {
     }
 }
 
-// Mark Material as Read
+// ============================================================
+// MARK MATERIAL AS READ
+// ============================================================
+
 async function markAsRead(index) {
+    console.log("✓ Marking as read:", index);
+    
     try {
-        const { doc, updateDoc, getDoc, setDoc } = window.firestoreModules;
-        const userRef = doc(window.db, "users", currentUser);
+        const { doc, updateDoc, getDoc } = firestoreModules;
+        const userRef = doc(db, "users", currentUser);
         const userSnap = await getDoc(userRef);
         
         if (!userSnap.exists()) {
@@ -332,7 +478,9 @@ async function markAsRead(index) {
             readStatus: currentReadStatus
         });
 
-        console.log("✅ Marked as read:", index);
+        console.log("✅ Marked as read successfully");
+        
+        // Reload materials to update UI
         await loadMaterials();
 
     } catch (error) {
@@ -340,39 +488,60 @@ async function markAsRead(index) {
     }
 }
 
-// Close Material Modal
+// ============================================================
+// CLOSE MATERIAL MODAL
+// ============================================================
+
 function closeMateriModal() {
     document.getElementById('materiModal').style.display = 'none';
+    console.log("✖️ Material modal closed");
 }
 
-// Upload Tugas Modal
+// ============================================================
+// UPLOAD TUGAS MODAL
+// ============================================================
+
 function uploadTugasModal(index) {
+    console.log("📤 Opening upload modal for:", mataKuliah[index]);
+    
     currentMatkulIndex = index;
     document.getElementById('tugasModal').style.display = 'block';
     document.getElementById('fileName').textContent = '';
     document.getElementById('tugasNote').value = '';
     document.getElementById('successMsg').style.display = 'none';
     document.getElementById('fileInput').value = '';
-    console.log("📤 Upload modal opened for:", mataKuliah[index]);
 }
 
-// Handle File Select
+// ============================================================
+// HANDLE FILE SELECT
+// ============================================================
+
 function handleFileSelect(event) {
     const file = event.target.files[0];
+    
     if (file) {
         const maxSize = 10 * 1024 * 1024; // 10MB
+        
         if (file.size > maxSize) {
             alert('❌ Ukuran file terlalu besar! Maksimal 10MB');
             event.target.value = '';
+            console.warn("⚠️ File too large:", file.size);
             return;
         }
-        document.getElementById('fileName').textContent = '✓ ' + file.name + ' (' + (file.size / 1024).toFixed(2) + ' KB)';
-        console.log("✅ File selected:", file.name);
+        
+        const fileSizeKB = (file.size / 1024).toFixed(2);
+        document.getElementById('fileName').textContent = `✓ ${file.name} (${fileSizeKB} KB)`;
+        console.log("✅ File selected:", file.name, fileSizeKB, "KB");
     }
 }
 
-// Upload Tugas
+// ============================================================
+// UPLOAD TUGAS
+// ============================================================
+
 async function uploadTugas() {
+    console.log("📤 Uploading assignment...");
+    
     const file = document.getElementById('fileInput').files[0];
     const note = document.getElementById('tugasNote').value.trim();
     const uploadBtn = document.getElementById('uploadBtn');
@@ -384,14 +553,14 @@ async function uploadTugas() {
 
     try {
         uploadBtn.disabled = true;
-        uploadBtn.textContent = "Mengupload...";
+        uploadBtn.textContent = "⏳ Mengupload...";
 
-        const { collection, doc, setDoc } = window.firestoreModules;
+        const { doc, setDoc } = firestoreModules;
         
         // Create submission document
         const timestamp = Date.now();
         const submissionId = `${currentUser}_${currentMatkulIndex}_${timestamp}`;
-        const submissionRef = doc(window.db, "submissions", submissionId);
+        const submissionRef = doc(db, "submissions", submissionId);
 
         const submissionData = {
             nim: currentUser,
@@ -409,8 +578,9 @@ async function uploadTugas() {
 
         console.log("✅ Submission saved:", submissionData);
 
+        // Show success message
         document.getElementById('successMsg').style.display = 'block';
-        document.getElementById('fileName').textContent = '✅ ' + file.name + ' (Berhasil diupload!)';
+        document.getElementById('fileName').textContent = `✅ ${file.name} (Berhasil diupload!)`;
 
         setTimeout(() => {
             closeTugasModal();
@@ -425,64 +595,90 @@ async function uploadTugas() {
     }
 }
 
-// Close Tugas Modal
+// ============================================================
+// CLOSE TUGAS MODAL
+// ============================================================
+
 function closeTugasModal() {
     document.getElementById('tugasModal').style.display = 'none';
     document.getElementById('fileInput').value = '';
     document.getElementById('fileName').textContent = '';
     document.getElementById('tugasNote').value = '';
     document.getElementById('successMsg').style.display = 'none';
+    console.log("✖️ Upload modal closed");
 }
 
-// Logout
+// ============================================================
+// LOGOUT
+// ============================================================
+
 function logout() {
     if (confirm("Apakah Anda yakin ingin keluar?")) {
+        console.log("👋 Logging out...");
+        
         currentUser = "";
         currentUserRole = "";
         currentMatkulIndex = -1;
+        
         document.getElementById('loginPage').style.display = "block";
         document.getElementById('dashboardPage').style.display = "none";
         document.getElementById('nim').value = "";
         document.getElementById('password').value = "";
         document.getElementById('errorMessage').style.display = "none";
+        
         console.log("✅ Logged out successfully");
     }
 }
 
-// Initialize on page load
+// ============================================================
+// INITIALIZE ON PAGE LOAD
+// ============================================================
+
 document.addEventListener('DOMContentLoaded', async function() {
-    console.log("🚀 Page loaded, initializing...");
+    console.log("🚀 Page loaded, initializing application...");
     
-    // Wait for Firebase to be ready
-    await waitForFirebase();
-    console.log("✅ Firebase ready!");
+    try {
+        // Wait for Firebase
+        await waitForFirebase();
+        console.log("✅ Firebase connection established");
+        
+        // Enter key for login
+        const passwordInput = document.getElementById('password');
+        if (passwordInput) {
+            passwordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    login();
+                }
+            });
+            console.log("✅ Enter key listener added");
+        }
 
-    // Enter key for login
-    const passwordInput = document.getElementById('password');
-    if (passwordInput) {
-        passwordInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                login();
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const materiModal = document.getElementById('materiModal');
+            const tugasModal = document.getElementById('tugasModal');
+            
+            if (event.target === materiModal) {
+                closeMateriModal();
             }
-        });
-    }
-
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-        const materiModal = document.getElementById('materiModal');
-        const tugasModal = document.getElementById('tugasModal');
-        if (event.target === materiModal) {
-            closeMateriModal();
+            if (event.target === tugasModal) {
+                closeTugasModal();
+            }
         }
-        if (event.target === tugasModal) {
-            closeTugasModal();
-        }
+        
+        console.log("✅ Event listeners initialized");
+        console.log("🎉 Application ready!");
+        
+    } catch (error) {
+        console.error("❌ Initialization error:", error);
+        alert("Gagal menginisialisasi aplikasi. Cek console untuk detail.");
     }
-
-    console.log("✅ Event listeners initialized");
 });
 
-// Make functions available globally
+// ============================================================
+// MAKE FUNCTIONS AVAILABLE GLOBALLY
+// ============================================================
+
 window.login = login;
 window.logout = logout;
 window.saveMateri = saveMateri;
@@ -493,4 +689,5 @@ window.handleFileSelect = handleFileSelect;
 window.uploadTugas = uploadTugas;
 window.closeTugasModal = closeTugasModal;
 
-console.log("✅ firebase-script.js loaded successfully");
+console.log("✅ firebase-script.js loaded successfully!");
+console.log("📝 All functions registered globally");
