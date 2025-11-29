@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #e6e8f0 0%, #f8f5fc 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -57,7 +57,7 @@
         }
 
         .logo h1 {
-            color: #667eea;
+            color: #050607;
             font-size: 28px;
             margin-bottom: 10px;
             line-height: 1.3;
@@ -98,14 +98,14 @@
 
         input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #08090a;
             background: white;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .btn {
             padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #11a11a 0%, #268d60 100%);
             color: white;
             border: none;
             border-radius: 10px;
@@ -117,16 +117,11 @@
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 10px 25px rgba(10, 11, 15, 0.4);
         }
 
         .btn:active {
             transform: translateY(0);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
         }
 
         .btn-full {
@@ -166,21 +161,6 @@
             border-left: 4px solid #c33;
         }
 
-        .success-message {
-            background: #d4edda;
-            color: #155724;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #28a745;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #667eea;
-        }
-
         .header {
             display: flex;
             justify-content: space-between;
@@ -193,7 +173,7 @@
         }
 
         .header h2 {
-            color: #667eea;
+            color: #0f1016;
             font-size: 28px;
         }
 
@@ -223,11 +203,11 @@
             padding: 25px;
             border-radius: 15px;
             margin-bottom: 30px;
-            border: 2px solid #667eea;
+            border: 2px solid #020203;
         }
 
         .admin-panel h3 {
-            color: #667eea;
+            color: #090a0e;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
@@ -246,7 +226,7 @@
         }
 
         thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0c0c10 0%, #20be3d 100%);
             color: white;
         }
 
@@ -407,6 +387,15 @@
             font-weight: 600;
         }
 
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #28a745;
+        }
+
         #loginPage {
             display: block;
         }
@@ -493,7 +482,7 @@
             <input type="password" id="password" placeholder="Masukkan password">
         </div>
 
-        <button class="btn btn-full" onclick="login()" id="loginBtn">Masuk</button>
+        <button class="btn btn-full" onclick="login()">Masuk</button>
     </div>
 
     <!-- Halaman Dashboard -->
@@ -545,17 +534,12 @@
                     <input type="datetime-local" id="deadline">
                 </div>
 
-                <button class="btn btn-success" onclick="saveMateri()" id="saveBtn">💾 Simpan Materi & Tugas</button>
+                <button class="btn btn-success" onclick="saveMateri()">💾 Simpan Materi & Tugas</button>
             </div>
         </div>
 
-        <!-- Loading -->
-        <div id="loadingTable" class="loading" style="display: none;">
-            <p>⏳ Memuat data...</p>
-        </div>
-
         <!-- Tabel Materi -->
-        <table id="materiTableContainer">
+        <table>
             <thead>
                 <tr>
                     <th style="width: 50px;">No</th>
@@ -585,7 +569,7 @@
         </div>
     </div>
 
-    <!-- Modal untuk Upload Tugas -->
+    <!-- Modal untuk Upload Tugas (Admin) -->
     <div id="tugasModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -608,56 +592,12 @@
                 <textarea id="tugasNote" placeholder="Tambahkan catatan untuk tugas ini"></textarea>
             </div>
             <div class="button-group">
-                <button class="btn btn-success" onclick="uploadTugas()" id="uploadBtn" style="flex: 1;">📤 Upload</button>
+                <button class="btn btn-success" onclick="uploadTugas()" style="flex: 1;">📤 Upload</button>
                 <button class="btn btn-danger" onclick="closeTugasModal()" style="flex: 1;">Batal</button>
             </div>
         </div>
     </div>
 
-   <!-- Firebase SDK -->
-<script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getFirestore, collection, doc, setDoc, getDoc, getDocs, updateDoc, query, orderBy, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
-    // ========================================
-    // 🔥🔥🔥 GANTI BAGIAN INI! 🔥🔥🔥
-    // ========================================
-   const firebaseConfig = {
-  apiKey: "AIzaSyAcIp6kn8bjczzdU5voMUicyAsTEgUUy6o",
-  authDomain: "tugas-sistem-informasi-35688.firebaseapp.com",
-  databaseURL: "https://tugas-sistem-informasi-35688-default-rtdb.firebaseio.com",
-  projectId: "tugas-sistem-informasi-35688",
-  storageBucket: "tugas-sistem-informasi-35688.firebasestorage.app",
-  messagingSenderId: "775160981474",
-  appId: "1:775160981474:web:bebe8c22e0490ded633bbb",
-  measurementId: "G-LNDYCFPCTW"
-};
-    
-    // ========================================
-    // 🔥🔥🔥 SAMPAI SINI! 🔥🔥🔥
-    // ========================================
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    window.db = db;
-    window.firestoreModules = { collection, doc, setDoc, getDoc, getDocs, updateDoc, query, orderBy, onSnapshot };
-    console.log("✅ Firebase initialized successfully!");
-</script>
-
-<script src="firebase-script.js"></script>
-;
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // Make db available globally
-        window.db = db;
-        window.firestoreModules = { collection, doc, setDoc, getDoc, getDocs, updateDoc, query, orderBy, onSnapshot };
-
-        console.log("✅ Firebase initialized successfully!");
-    </script>
-
-    <script src="firebase-script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
