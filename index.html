@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E-learning Kelas C Manajemen Pendidikan</title>
     <style>
+        /* CSS SAMA SEPERTI SEBELUMNYA - TIDAK PERLU DIGANTI */
         * {
             margin: 0;
             padding: 0;
@@ -13,7 +14,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #e6e8f0 0%, #f8f5fc 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -34,7 +35,7 @@
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             padding: 30px;
-            max-width: 1200px;
+            max-width: 1400px;
             width: 100%;
             margin: 0 auto;
             animation: fadeIn 0.5s ease-in;
@@ -57,7 +58,7 @@
         }
 
         .logo h1 {
-            color: #050607;
+            color: #667eea;
             font-size: 28px;
             margin-bottom: 10px;
             line-height: 1.3;
@@ -98,14 +99,14 @@
 
         input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: #08090a;
+            border-color: #667eea;
             background: white;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .btn {
             padding: 12px 24px;
-            background: linear-gradient(135deg, #11a11a 0%, #268d60 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             border-radius: 10px;
@@ -117,11 +118,16 @@
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(10, 11, 15, 0.4);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
         }
 
         .btn:active {
             transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .btn-full {
@@ -138,16 +144,16 @@
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
         }
 
-        .btn-success:hover {
-            box-shadow: 0 10px 25px rgba(40, 167, 69, 0.4);
-        }
-
         .btn-danger {
             background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
         }
 
-        .btn-danger:hover {
-            box-shadow: 0 10px 25px rgba(220, 53, 69, 0.4);
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
         }
 
         .error-message {
@@ -159,6 +165,15 @@
             font-size: 14px;
             display: none;
             border-left: 4px solid #c33;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #28a745;
         }
 
         .header {
@@ -173,7 +188,7 @@
         }
 
         .header h2 {
-            color: #0f1016;
+            color: #667eea;
             font-size: 28px;
         }
 
@@ -198,21 +213,28 @@
             margin-top: 5px;
         }
 
-        .admin-panel {
+        .breadcrumb {
             background: #f8f9fa;
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            border: 2px solid #020203;
-        }
-
-        .admin-panel h3 {
-            color: #090a0e;
+            padding: 15px 20px;
+            border-radius: 10px;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 20px;
+        }
+
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb span {
+            color: #999;
         }
 
         table {
@@ -226,7 +248,7 @@
         }
 
         thead {
-            background: linear-gradient(135deg, #0c0c10 0%, #20be3d 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
 
@@ -249,50 +271,60 @@
             background: #f8f9fa;
         }
 
-        .materi-link {
+        .matkul-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #e0e0e0;
+        }
+
+        .matkul-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .matkul-card h3 {
             color: #667eea;
-            text-decoration: none;
+            margin-bottom: 10px;
+        }
+
+        .matkul-card p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .matkul-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
             font-weight: 600;
-            padding: 6px 12px;
-            border-radius: 6px;
             display: inline-block;
-            transition: all 0.3s ease;
-            background: #f0f0f0;
         }
 
-        .materi-link:hover {
-            background: #667eea;
-            color: white;
+        .status-submitted {
+            background: #d4edda;
+            color: #155724;
         }
 
-        .materi-link.read {
-            background: #28a745;
-            color: white;
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
         }
 
-        .materi-link.read:hover {
-            background: #218838;
-        }
-
-        .tugas-link {
-            color: #764ba2;
-            text-decoration: none;
-            font-weight: 600;
-            padding: 6px 12px;
-            border-radius: 6px;
-            display: inline-block;
-            transition: all 0.3s ease;
-            background: #f0f0f0;
-        }
-
-        .tugas-link:hover {
-            background: #764ba2;
-            color: white;
-        }
-
-        .no-data {
-            color: #999;
-            font-style: italic;
+        .status-graded {
+            background: #d1ecf1;
+            color: #0c5460;
         }
 
         .modal {
@@ -382,32 +414,41 @@
             font-weight: 600;
         }
 
-        .deadline {
-            color: #dc3545;
-            font-weight: 600;
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
         }
 
-        .success-message {
-            background: #d4edda;
-            color: #155724;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #28a745;
+        .grade-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .grade-section h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .no-data {
+            color: #999;
+            font-style: italic;
         }
 
         #loginPage {
             display: block;
         }
 
-        #dashboardPage {
+        #dashboardPage, #studentListPage {
             display: none;
         }
 
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
         }
 
         @media (max-width: 768px) {
@@ -427,11 +468,15 @@
             th, td {
                 padding: 10px 8px;
             }
+
+            .matkul-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Halaman Login -->
+    <!-- HALAMAN LOGIN -->
     <div class="container" id="loginPage">
         <div class="logo">
             <h1>E-learning Kelas C<br>Manajemen Pendidikan</h1>
@@ -482,122 +527,531 @@
             <input type="password" id="password" placeholder="Masukkan password">
         </div>
 
-        <button class="btn btn-full" onclick="login()">Masuk</button>
+        <button class="btn btn-full" id="loginBtn">Masuk</button>
     </div>
 
-    <!-- Halaman Dashboard -->
+    <!-- HALAMAN DASHBOARD -->
     <div class="dashboard-container" id="dashboardPage">
         <div class="header">
             <div>
-                <h2>📚 Kumpulan Materi Kuliah</h2>
+                <h2>📚 Daftar Mata Kuliah</h2>
                 <p style="color: #666; margin-top: 5px;">Kelas C Manajemen Pendidikan</p>
             </div>
             <div class="user-info">
                 <p><strong>NIM:</strong> <span id="userNim"></span></p>
-                <span id="adminBadge"></span>
+                <span class="badge-admin">👑 ADMIN</span>
                 <br>
-                <button class="btn btn-danger btn-small" onclick="logout()" style="margin-top: 10px;">Keluar</button>
+                <button class="btn btn-danger btn-small" id="logoutBtn1" style="margin-top: 10px;">Keluar</button>
             </div>
         </div>
 
-        <!-- Panel Admin (Hanya untuk NIM 131424090) -->
-        <div id="adminPanel" style="display: none;">
-            <div class="admin-panel">
-                <h3>⚙️ Panel Admin</h3>
-                <div class="form-group">
-                    <label for="selectMatkul">Pilih Mata Kuliah</label>
-                    <select id="selectMatkul">
-                        <option value="">-- Pilih Mata Kuliah --</option>
-                        <option value="0">Penelitian Kuantitatif</option>
-                        <option value="1">Manajemen Berbasis Sekolah</option>
-                        <option value="2">Manajemen Peserta Didik</option>
-                        <option value="3">Manajemen Sarana & Prasarana</option>
-                        <option value="4">Sistem Informasi dan Pengambilan Keputusan</option>
-                        <option value="5">Kemaritiman</option>
-                        <option value="6">Psikologi Manajemen Pendidikan</option>
-                        <option value="7">Manajemen Kearsipan</option>
-                    </select>
-                </div>
+        <div id="loadingMatkul" class="loading" style="display: none;">
+            <p>⏳ Memuat data mata kuliah...</p>
+        </div>
 
-                <div class="form-group">
-                    <label for="materiContent">Link/Konten Materi</label>
-                    <textarea id="materiContent" placeholder="Masukkan link atau konten materi"></textarea>
-                </div>
+        <div class="matkul-grid" id="matkulGrid">
+            <!-- Mata kuliah cards -->
+        </div>
+    </div>
 
-                <div class="form-group">
-                    <label for="tugasContent">Deskripsi Tugas</label>
-                    <textarea id="tugasContent" placeholder="Masukkan deskripsi tugas"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="deadline">Waktu Pengumpulan Tugas</label>
-                    <input type="datetime-local" id="deadline">
-                </div>
-
-                <button class="btn btn-success" onclick="saveMateri()">💾 Simpan Materi & Tugas</button>
+    <!-- HALAMAN DAFTAR MAHASISWA -->
+    <div class="dashboard-container" id="studentListPage">
+        <div class="header">
+            <div>
+                <h2 id="matkulTitle">📖 Daftar Mahasiswa</h2>
+            </div>
+            <div class="user-info">
+                <p><strong>NIM:</strong> <span id="userNimStudent"></span></p>
+                <span class="badge-admin">👑 ADMIN</span>
+                <br>
+                <button class="btn btn-danger btn-small" id="logoutBtn2" style="margin-top: 10px;">Keluar</button>
             </div>
         </div>
 
-        <!-- Tabel Materi -->
-        <table>
+        <div class="breadcrumb">
+            <a href="javascript:void(0)" id="backBtn">🏠 Dashboard</a>
+            <span>›</span>
+            <span id="breadcrumbMatkul">Mata Kuliah</span>
+        </div>
+
+        <div id="loadingStudents" class="loading" style="display: none;">
+            <p>⏳ Memuat data mahasiswa...</p>
+        </div>
+
+        <table id="studentTable">
             <thead>
                 <tr>
                     <th style="width: 50px;">No</th>
-                    <th>Mata Kuliah</th>
-                    <th>Materi</th>
-                    <th>Tugas</th>
-                    <th>Waktu Pengumpulan</th>
+                    <th>NIM</th>
+                    <th>Status Tugas</th>
+                    <th>File Tugas</th>
+                    <th>Waktu Upload</th>
+                    <th>Nilai/Komentar</th>
+                    <th>Aksi</th>
                 </tr>
             </thead>
-            <tbody id="materiTable">
-                <!-- Data akan diisi dengan JavaScript -->
+            <tbody id="studentTableBody">
             </tbody>
         </table>
     </div>
 
-    <!-- Modal untuk Melihat Materi -->
-    <div id="materiModal" class="modal">
+    <!-- MODAL UPLOAD -->
+    <div id="uploadModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modalTitle">Materi</h3>
-                <span class="close" onclick="closeMateriModal()">&times;</span>
+                <h3>📤 Upload Tugas</h3>
+                <span class="close" id="closeUpload">&times;</span>
             </div>
-            <div id="modalContent" style="padding: 20px 0; line-height: 1.8;">
-                <!-- Konten materi akan ditampilkan di sini -->
-            </div>
-            <button class="btn btn-full" onclick="closeMateriModal()">Tutup</button>
-        </div>
-    </div>
-
-    <!-- Modal untuk Upload Tugas (Admin) -->
-    <div id="tugasModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Upload Tugas</h3>
-                <span class="close" onclick="closeTugasModal()">&times;</span>
-            </div>
-            <div id="successMsg" class="success-message" style="display: none;">
-                Tugas berhasil diupload!
+            <div id="uploadSuccessMsg" class="success-message" style="display: none;">
+                ✅ Tugas berhasil diupload!
             </div>
             <div class="form-group">
                 <label>File Tugas</label>
-                <div class="file-upload" onclick="document.getElementById('fileInput').click()">
-                    <input type="file" id="fileInput" onchange="handleFileSelect(event)">
+                <div class="file-upload" id="fileUploadArea">
+                    <input type="file" id="uploadFileInput">
                     <p>📁 Klik untuk pilih file</p>
-                    <p class="file-name" id="fileName"></p>
+                    <p class="file-name" id="uploadFileName"></p>
                 </div>
             </div>
             <div class="form-group">
-                <label for="tugasNote">Catatan (Opsional)</label>
-                <textarea id="tugasNote" placeholder="Tambahkan catatan untuk tugas ini"></textarea>
+                <label for="uploadNote">Catatan (Opsional)</label>
+                <textarea id="uploadNote" placeholder="Tambahkan catatan"></textarea>
             </div>
             <div class="button-group">
-                <button class="btn btn-success" onclick="uploadTugas()" style="flex: 1;">📤 Upload</button>
-                <button class="btn btn-danger" onclick="closeTugasModal()" style="flex: 1;">Batal</button>
+                <button class="btn btn-success" id="uploadBtn" style="flex: 1;">📤 Upload</button>
+                <button class="btn btn-danger" id="cancelUploadBtn" style="flex: 1;">Batal</button>
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
-</body>
-</html>
+    <!-- MODAL PENILAIAN -->
+    <div id="gradeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📝 Penilaian & Komentar</h3>
+                <span class="close" id="closeGrade">&times;</span>
+            </div>
+            <div id="gradeSuccessMsg" class="success-message" style="display: none;">
+                ✅ Penilaian berhasil disimpan!
+            </div>
+            <div class="form-group">
+                <label>NIM Mahasiswa</label>
+                <input type="text" id="gradeStudentNim" readonly>
+            </div>
+            <div class="form-group">
+                <label for="gradeScore">Nilai (0-100)</label>
+                <input type="number" id="gradeScore" min="0" max="100" placeholder="Masukkan nilai">
+            </div>
+            <div class="form-group">
+                <label for="gradeComment">Komentar</label>
+                <textarea id="gradeComment" placeholder="Masukkan komentar"></textarea>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-success" id="gradeBtn" style="flex: 1;">💾 Simpan</button>
+                <button class="btn btn-danger" id="cancelGradeBtn" style="flex: 1;">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE SDK -->
+    <script type="module">
+        // Import Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, get, update, push, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // ========================================
+        // 🔥🔥🔥 GANTI CONFIG FIREBASE DI SINI 🔥🔥🔥
+        // ========================================
+        const firebaseConfig = {
+  apiKey: "AIzaSyAcIp6kn8bjczzdU5voMUicyAsTEgUUy6o",
+  authDomain: "tugas-sistem-informasi-35688.firebaseapp.com",
+  databaseURL: "https://tugas-sistem-informasi-35688-default-rtdb.firebaseio.com",
+  projectId: "tugas-sistem-informasi-35688",
+  storageBucket: "tugas-sistem-informasi-35688.firebasestorage.app",
+  messagingSenderId: "775160981474",
+  appId: "1:775160981474:web:bebe8c22e0490ded633bbb",
+  measurementId: "G-LNDYCFPCTW"
+};
+        // ========================================
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            const database = getDatabase(app);
+            
+            window.firebaseApp = app;
+            window.firebaseDatabase = database;
+            window.firebaseDB = { ref, set, get, update, push, onValue, remove };
+            window.firebaseReady = true;
+            
+            console.log("✅ Firebase initialized successfully!");
+        } catch (error) {
+            console.error("❌ Firebase initialization error:", error);
+            alert("Error: " + error.message);
+        }
+    </script>
+
+    <!-- Main Script -->
+    <script>
+        // Inline JavaScript untuk memastikan semua fungsi tersedia
+        console.log("🚀 Loading application...");
+
+        const mataKuliah = [
+            "Penelitian Kuantitatif",
+            "Manajemen Berbasis Sekolah",
+            "Manajemen Peserta Didik",
+            "Manajemen Sarana & Prasarana",
+            "Sistem Informasi dan Pengambilan Keputusan",
+            "Kemaritiman",
+            "Psikologi Manajemen Pendidikan",
+            "Manajemen Kearsipan"
+        ];
+
+        const allStudents = [
+            "131424061", "131424062", "131424063", "131424064", "131424065",
+            "131424066", "131424067", "131424068", "131424069", "131424070",
+            "131424071", "131424072", "131424073", "131424074", "131424076",
+            "131424077", "131424078", "131424079", "131424080", "131424081",
+            "131424082", "131424083", "131424084", "131424085", "131424086",
+            "131424088", "131424089", "131424090"
+        ];
+
+        let currentUser = "";
+        let currentMatkulIndex = -1;
+        let currentGradeNim = "";
+
+        // Wait for Firebase
+        function waitForFirebase() {
+            return new Promise((resolve, reject) => {
+                let attempts = 0;
+                const check = setInterval(() => {
+                    if (window.firebaseReady && window.firebaseDatabase && window.firebaseDB) {
+                        clearInterval(check);
+                        console.log("✅ Firebase ready");
+                        resolve();
+                    }
+                    attempts++;
+                    if (attempts > 50) {
+                        clearInterval(check);
+                        reject(new Error("Firebase timeout"));
+                    }
+                }, 100);
+            });
+        }
+
+        // LOGIN
+        async function login() {
+            console.log("🔐 Login...");
+            const nim = document.getElementById('nim').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMessage');
+            const btn = document.getElementById('loginBtn');
+
+            errorMsg.style.display = 'none';
+
+            if (!nim) {
+                errorMsg.textContent = "Pilih NIM!";
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            if (password !== "12345678") {
+                errorMsg.textContent = "Password salah!";
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            try {
+                btn.disabled = true;
+                btn.textContent = "Loading...";
+
+                await waitForFirebase();
+
+                const { ref, set, get } = window.firebaseDB;
+                const db = window.firebaseDatabase;
+
+                const userRef = ref(db, 'users/' + nim);
+                const snapshot = await get(userRef);
+
+                if (!snapshot.exists()) {
+                    await set(userRef, {
+                        nim: nim,
+                        role: "admin",
+                        createdAt: new Date().toISOString()
+                    });
+                }
+
+                currentUser = nim;
+                showDashboard();
+
+            } catch (error) {
+                console.error("Error:", error);
+                errorMsg.textContent = "Error: " + error.message;
+                errorMsg.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Masuk";
+            }
+        }
+
+        // SHOW DASHBOARD
+        async function showDashboard() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('dashboardPage').style.display = 'block';
+            document.getElementById('studentListPage').style.display = 'none';
+            document.getElementById('userNim').textContent = currentUser;
+
+            await loadMataKuliah();
+        }
+
+        // LOAD MATA KULIAH
+        async function loadMataKuliah() {
+            const grid = document.getElementById('matkulGrid');
+            grid.innerHTML = '';
+
+            mataKuliah.forEach((mk, idx) => {
+                const card = document.createElement('div');
+                card.className = 'matkul-card';
+                card.onclick = () => openStudentList(idx);
+                card.innerHTML = `
+                    <h3>${idx + 1}. ${mk}</h3>
+                    <p>Klik untuk melihat daftar mahasiswa →</p>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // OPEN STUDENT LIST
+        async function openStudentList(idx) {
+            currentMatkulIndex = idx;
+            document.getElementById('dashboardPage').style.display = 'none';
+            document.getElementById('studentListPage').style.display = 'block';
+            document.getElementById('matkulTitle').textContent = `📖 ${mataKuliah[idx]}`;
+            document.getElementById('breadcrumbMatkul').textContent = mataKuliah[idx];
+            document.getElementById('userNimStudent').textContent = currentUser;
+
+            await loadStudentList();
+        }
+
+        // LOAD STUDENT LIST
+        async function loadStudentList() {
+            const tbody = document.getElementById('studentTableBody');
+            tbody.innerHTML = '';
+
+            const { ref, get } = window.firebaseDB;
+            const db = window.firebaseDatabase;
+
+            for (let i = 0; i < allStudents.length; i++) {
+                const nim = allStudents[i];
+
+                const submissionRef = ref(db, `submissions/matkul_${currentMatkulIndex}/${nim}`);
+                const subSnap = await get(submissionRef);
+
+                const gradeRef = ref(db, `grades/matkul_${currentMatkulIndex}/${nim}`);
+                const gradeSnap = await get(gradeRef);
+
+                const hasSubmission = subSnap.exists();
+                const hasGrade = gradeSnap.exists();
+
+                let statusBadge = '<span class="status-badge status-pending">Belum Upload</span>';
+                let fileInfo = '-';
+                let uploadTime = '-';
+                let gradeInfo = '-';
+                let actions = '';
+
+                if (hasSubmission) {
+                    const subData = subSnap.val();
+                    statusBadge = hasGrade ? 
+                        '<span class="status-badge status-graded">✓ Dinilai</span>' :
+                        '<span class="status-badge status-submitted">✓ Upload</span>';
+                    fileInfo = subData.fileName || 'file.pdf';
+                    uploadTime = new Date(subData.uploadedAt).toLocaleDateString('id-ID');
+
+                    if (hasGrade) {
+                        const gradeData = gradeSnap.val();
+                        gradeInfo = `<strong>${gradeData.score}/100</strong><br><small>${gradeData.comment || '-'}</small>`;
+                    }
+
+                    actions = `<button class="btn btn-warning btn-small" onclick="openGradeModal('${nim}')">${hasGrade ? 'Edit' : 'Nilai'}</button>`;
+                } else {
+                    if (currentUser === nim) {
+                        actions = `<button class="btn btn-success btn-small" onclick="openUploadModal('${nim}')">Upload</button>`;
+                    }
+                }
+
+                const row = `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td><strong>${nim}</strong></td>
+                        <td>${statusBadge}</td>
+                        <td>${fileInfo}</td>
+                        <td>${uploadTime}</td>
+                        <td>${gradeInfo}</td>
+                        <td>${actions}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            }
+        }
+
+        // BACK TO DASHBOARD
+        function backToDashboard() {
+            showDashboard();
+        }
+
+        // UPLOAD MODAL
+        function openUploadModal(nim ) {
+document.getElementById('uploadModal').style.display = 'block';
+document.getElementById('uploadFileName').textContent = '';
+document.getElementById('uploadNote').value = '';
+}
+function closeUploadModal() {
+        document.getElementById('uploadModal').style.display = 'none';
+    }
+
+    async function submitTugas() {
+        const file = document.getElementById('uploadFileInput').files[0];
+        const note = document.getElementById('uploadNote').value;
+
+        if (!file) {
+            alert("Pilih file!");
+            return;
+        }
+
+        const btn = document.getElementById('uploadBtn');
+        btn.disabled = true;
+
+        try {
+            const { ref, set } = window.firebaseDB;
+            const db = window.firebaseDatabase;
+
+            const data = {
+                nim: currentUser,
+                fileName: file.name,
+                fileSize: file.size,
+                note: note,
+                uploadedAt: new Date().toISOString()
+            };
+
+            await set(ref(db, `submissions/matkul_${currentMatkulIndex}/${currentUser}`), data);
+
+            document.getElementById('uploadSuccessMsg').style.display = 'block';
+            setTimeout(() => {
+                closeUploadModal();
+                loadStudentList();
+            }, 1500);
+
+        } catch (error) {
+            alert("Error: " + error.message);
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    // GRADE MODAL
+    async function openGradeModal(nim) {
+        currentGradeNim = nim;
+        document.getElementById('gradeModal').style.display = 'block';
+        document.getElementById('gradeStudentNim').value = nim;
+
+        const { ref, get } = window.firebaseDB;
+        const db = window.firebaseDatabase;
+
+        const gradeRef = ref(db, `grades/matkul_${currentMatkulIndex}/${nim}`);
+        const snapshot = await get(gradeRef);
+
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+            document.getElementById('gradeScore').value = data.score || '';
+            document.getElementById('gradeComment').value = data.comment || '';
+        } else {
+            document.getElementById('gradeScore').value = '';
+            document.getElementById('gradeComment').value = '';
+        }
+    }
+
+    function closeGradeModal() {
+        document.getElementById('gradeModal').style.display = 'none';
+    }
+
+    async function submitGrade() {
+        const score = document.getElementById('gradeScore').value;
+        const comment = document.getElementById('gradeComment').value;
+
+        if (!score) {
+            alert("Masukkan nilai!");
+            return;
+        }
+
+        const btn = document.getElementById('gradeBtn');
+        btn.disabled = true;
+
+        try {
+            const { ref, set } = window.firebaseDB;
+            const db = window.firebaseDatabase;
+
+            const data = {
+                nim: currentGradeNim,
+                score: parseInt(score),
+                comment: comment,
+                gradedBy: currentUser,
+                gradedAt: new Date().toISOString()
+            };
+
+            await set(ref(db, `grades/matkul_${currentMatkulIndex}/${currentGradeNim}`), data);
+
+            document.getElementById('gradeSuccessMsg').style.display = 'block';
+            setTimeout(() => {
+                closeGradeModal();
+                loadStudentList();
+            }, 1500);
+
+        } catch (error) {
+            alert("Error: " + error.message);
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    // LOGOUT
+    function logout() {
+        if (confirm("Keluar?")) {
+            currentUser = "";
+            document.getElementById('loginPage').style.display = 'block';
+            document.getElementById('dashboardPage').style.display = 'none';
+            document.getElementById('studentListPage').style.display = 'none';
+            document.getElementById('nim').value = '';
+            document.getElementById('password').value = '';
+        }
+    }
+
+    // EVENT LISTENERS
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('loginBtn').addEventListener('click', login);
+        document.getElementById('logoutBtn1').addEventListener('click', logout);
+        document.getElementById('logoutBtn2').addEventListener('click', logout);
+        document.getElementById('backBtn').addEventListener('click', backToDashboard);
+        
+        document.getElementById('closeUpload').addEventListener('click', closeUploadModal);
+        document.getElementById('cancelUploadBtn').addEventListener('click', closeUploadModal);
+        document.getElementById('uploadBtn').addEventListener('click', submitTugas);
+        document.getElementById('fileUploadArea').addEventListener('click', () => {
+            document.getElementById('uploadFileInput').click();
+        });
+        document.getElementById('uploadFileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('uploadFileName').textContent = `✓ ${file.name}`;
+            }
+        });
+        
+        document.getElementById('closeGrade').addEventListener('click', closeGradeModal);
+        document.getElementById('cancelGradeBtn').addEventListener('click', closeGradeModal);
+        document.getElementById('gradeBtn').addEventListener('click', submitGrade);
+        
+        document.getElementById('password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') login();
+        });
+
+        console.log("✅ Ready!");
+    });
+</script>
