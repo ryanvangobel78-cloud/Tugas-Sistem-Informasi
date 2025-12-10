@@ -692,7 +692,6 @@
 
     <!-- Main Script -->
     <script>
-        // Inline JavaScript untuk memastikan semua fungsi tersedia
         console.log("🚀 Loading application...");
 
         const mataKuliah = [
@@ -706,13 +705,36 @@
             "Manajemen Kearsipan"
         ];
 
+        // DATA MAHASISWA DENGAN NAMA
         const allStudents = [
-            "131424061", "131424062", "131424063", "131424064", "131424065",
-            "131424066", "131424067", "131424068", "131424069", "131424070",
-            "131424071", "131424072", "131424073", "131424074", "131424076",
-            "131424077", "131424078", "131424079", "131424080", "131424081",
-            "131424082", "131424083", "131424084", "131424085", "131424086",
-            "131424088", "131424089", "131424090"
+            { nim: "131424061", nama: "HAIDIL RUDIN" },
+            { nim: "131424062", nama: "SRI RAHMAWATI NOHO" },
+            { nim: "131424063", nama: "CITRA BAGUE" },
+            { nim: "131424064", nama: "MOHAMMAD LAIL NASARU" },
+            { nim: "131424065", nama: "CINDRAWATI PULUBUHU" },
+            { nim: "131424066", nama: "PRISKAWATI MOHA" },
+            { nim: "131424067", nama: "SITI Y. NGGIU" },
+            { nim: "131424068", nama: "SALWA SULISTIA ISMAIL" },
+            { nim: "131424069", nama: "DEFIYANA DINA" },
+            { nim: "131424070", nama: "RINA AMELIA PAKAYA" },
+            { nim: "131424071", nama: "TIARA SAFITRI" },
+            { nim: "131424072", nama: "NURJANNAH A. PALILATI" },
+            { nim: "131424073", nama: "NOLDI LAUDENGI" },
+            { nim: "131424074", nama: "NEYZA USMAN" },
+            { nim: "131424076", nama: "EYON PAKAYA" },
+            { nim: "131424077", nama: "FERLINA SIOLIMBONA" },
+            { nim: "131424078", nama: "ADELIA NURQAMARIAH HAMID" },
+            { nim: "131424079", nama: "RAMADAN NUSURA" },
+            { nim: "131424080", nama: "ZAHWA AULIA RAMADHANI BAKARI" },
+            { nim: "131424081", nama: "FRISKA POU" },
+            { nim: "131424082", nama: "CICI FADILA HUSAIN" },
+            { nim: "131424083", nama: "ADELIA SALEH" },
+            { nim: "131424084", nama: "INDRIANI ABDULLAH" },
+            { nim: "131424085", nama: "MUHAMAD RIANDA PUTERA PAPUTUNGAN" },
+            { nim: "131424086", nama: "AULIA APRILIA ISHAK" },
+            { nim: "131424088", nama: "MOHAMAD FAUZAN SUPU" },
+            { nim: "131424089", nama: "NUR REYSA PRANING AHMAD" },
+            { nim: "131424090", nama: "RIAN VAN GOBEL" }
         ];
 
         let currentUser = "";
@@ -736,6 +758,12 @@
                     }
                 }, 100);
             });
+        }
+
+        // GET STUDENT NAME BY NIM
+        function getStudentName(nim) {
+            const student = allStudents.find(s => s.nim === nim);
+            return student ? student.nama : "Unknown";
         }
 
         // LOGIN
@@ -775,6 +803,7 @@
                 if (!snapshot.exists()) {
                     await set(userRef, {
                         nim: nim,
+                        nama: getStudentName(nim),
                         role: "admin",
                         createdAt: new Date().toISOString()
                     });
@@ -841,7 +870,9 @@
             const db = window.firebaseDatabase;
 
             for (let i = 0; i < allStudents.length; i++) {
-                const nim = allStudents[i];
+                const student = allStudents[i];
+                const nim = student.nim;
+                const nama = student.nama;
 
                 const submissionRef = ref(db, `submissions/matkul_${currentMatkulIndex}/${nim}`);
                 const subSnap = await get(submissionRef);
@@ -853,35 +884,51 @@
                 const hasGrade = gradeSnap.exists();
 
                 let statusBadge = '<span class="status-badge status-pending">Belum Upload</span>';
-                let fileInfo = '-';
-                let uploadTime = '-';
-                let gradeInfo = '-';
-                let actions = '';
+                let fileInfo = '<span class="no-data">-</span>';
+                let uploadTime = '<span class="no-data">-</span>';
+                let gradeInfo = '<span class="no-data">Belum dinilai</span>';
+                let actions = '<span class="no-data">-</span>';
 
                 if (hasSubmission) {
                     const subData = subSnap.val();
                     statusBadge = hasGrade ? 
                         '<span class="status-badge status-graded">✓ Dinilai</span>' :
                         '<span class="status-badge status-submitted">✓ Upload</span>';
-                    fileInfo = subData.fileName || 'file.pdf';
-                    uploadTime = new Date(subData.uploadedAt).toLocaleDateString('id-ID');
+                    fileInfo = `📄 ${subData.fileName || 'file.pdf'}`;
+                    if (subData.note) {
+                        fileInfo += `<br><small style="color: #666;">Catatan: ${subData.note}</small>`;
+                    }
+                    uploadTime = new Date(subData.uploadedAt).toLocaleDateString('id-ID', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
 
                     if (hasGrade) {
                         const gradeData = gradeSnap.val();
-                        gradeInfo = `<strong>${gradeData.score}/100</strong><br><small>${gradeData.comment || '-'}</small>`;
+                        gradeInfo = `
+                            <strong style="color: #667eea; font-size: 16px;">Nilai: ${gradeData.score}/100</strong><br>
+                            <small style="color: #666;">${gradeData.comment || 'Tidak ada komentar'}</small><br>
+                            <small style="color: #999;">Dinilai oleh: ${getStudentName(gradeData.gradedBy)}</small>
+                        `;
                     }
 
-                    actions = `<button class="btn btn-warning btn-small" onclick="openGradeModal('${nim}')">${hasGrade ? 'Edit' : 'Nilai'}</button>`;
+                    actions = `<button class="btn btn-warning btn-small" onclick="openGradeModal('${nim}')">${hasGrade ? '✏️ Edit Nilai' : '📝 Beri Nilai'}</button>`;
                 } else {
                     if (currentUser === nim) {
-                        actions = `<button class="btn btn-success btn-small" onclick="openUploadModal('${nim}')">Upload</button>`;
+                        actions = `<button class="btn btn-success btn-small" onclick="openUploadModal('${nim}')">📤 Upload Tugas</button>`;
                     }
                 }
 
                 const row = `
                     <tr>
                         <td>${i + 1}</td>
-                        <td><strong>${nim}</strong></td>
+                        <td>
+                            <strong>${nim}</strong><br>
+                            <small style="color: #666;">${nama}</small>
+                        </td>
                         <td>${statusBadge}</td>
                         <td>${fileInfo}</td>
                         <td>${uploadTime}</td>
@@ -899,159 +946,190 @@
         }
 
         // UPLOAD MODAL
-        function openUploadModal(nim ) {
-document.getElementById('uploadModal').style.display = 'block';
-document.getElementById('uploadFileName').textContent = '';
-document.getElementById('uploadNote').value = '';
-}
-function closeUploadModal() {
-        document.getElementById('uploadModal').style.display = 'none';
-    }
-
-    async function submitTugas() {
-        const file = document.getElementById('uploadFileInput').files[0];
-        const note = document.getElementById('uploadNote').value;
-
-        if (!file) {
-            alert("Pilih file!");
-            return;
+        function openUploadModal(nim) {
+            document.getElementById('uploadModal').style.display = 'block';
+            document.getElementById('uploadFileName').textContent = '';
+            document.getElementById('uploadNote').value = '';
+            document.getElementById('uploadSuccessMsg').style.display = 'none';
         }
 
-        const btn = document.getElementById('uploadBtn');
-        btn.disabled = true;
-
-        try {
-            const { ref, set } = window.firebaseDB;
-            const db = window.firebaseDatabase;
-
-            const data = {
-                nim: currentUser,
-                fileName: file.name,
-                fileSize: file.size,
-                note: note,
-                uploadedAt: new Date().toISOString()
-            };
-
-            await set(ref(db, `submissions/matkul_${currentMatkulIndex}/${currentUser}`), data);
-
-            document.getElementById('uploadSuccessMsg').style.display = 'block';
-            setTimeout(() => {
-                closeUploadModal();
-                loadStudentList();
-            }, 1500);
-
-        } catch (error) {
-            alert("Error: " + error.message);
-        } finally {
-            btn.disabled = false;
-        }
-    }
-
-    // GRADE MODAL
-    async function openGradeModal(nim) {
-        currentGradeNim = nim;
-        document.getElementById('gradeModal').style.display = 'block';
-        document.getElementById('gradeStudentNim').value = nim;
-
-        const { ref, get } = window.firebaseDB;
-        const db = window.firebaseDatabase;
-
-        const gradeRef = ref(db, `grades/matkul_${currentMatkulIndex}/${nim}`);
-        const snapshot = await get(gradeRef);
-
-        if (snapshot.exists()) {
-            const data = snapshot.val();
-            document.getElementById('gradeScore').value = data.score || '';
-            document.getElementById('gradeComment').value = data.comment || '';
-        } else {
-            document.getElementById('gradeScore').value = '';
-            document.getElementById('gradeComment').value = '';
-        }
-    }
-
-    function closeGradeModal() {
-        document.getElementById('gradeModal').style.display = 'none';
-    }
-
-    async function submitGrade() {
-        const score = document.getElementById('gradeScore').value;
-        const comment = document.getElementById('gradeComment').value;
-
-        if (!score) {
-            alert("Masukkan nilai!");
-            return;
+        function closeUploadModal() {
+            document.getElementById('uploadModal').style.display = 'none';
         }
 
-        const btn = document.getElementById('gradeBtn');
-        btn.disabled = true;
+        async function submitTugas() {
+            const file = document.getElementById('uploadFileInput').files[0];
+            const note = document.getElementById('uploadNote').value;
 
-        try {
-            const { ref, set } = window.firebaseDB;
-            const db = window.firebaseDatabase;
-
-            const data = {
-                nim: currentGradeNim,
-                score: parseInt(score),
-                comment: comment,
-                gradedBy: currentUser,
-                gradedAt: new Date().toISOString()
-            };
-
-            await set(ref(db, `grades/matkul_${currentMatkulIndex}/${currentGradeNim}`), data);
-
-            document.getElementById('gradeSuccessMsg').style.display = 'block';
-            setTimeout(() => {
-                closeGradeModal();
-                loadStudentList();
-            }, 1500);
-
-        } catch (error) {
-            alert("Error: " + error.message);
-        } finally {
-            btn.disabled = false;
-        }
-    }
-
-    // LOGOUT
-    function logout() {
-        if (confirm("Keluar?")) {
-            currentUser = "";
-            document.getElementById('loginPage').style.display = 'block';
-            document.getElementById('dashboardPage').style.display = 'none';
-            document.getElementById('studentListPage').style.display = 'none';
-            document.getElementById('nim').value = '';
-            document.getElementById('password').value = '';
-        }
-    }
-
-    // EVENT LISTENERS
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('loginBtn').addEventListener('click', login);
-        document.getElementById('logoutBtn1').addEventListener('click', logout);
-        document.getElementById('logoutBtn2').addEventListener('click', logout);
-        document.getElementById('backBtn').addEventListener('click', backToDashboard);
-        
-        document.getElementById('closeUpload').addEventListener('click', closeUploadModal);
-        document.getElementById('cancelUploadBtn').addEventListener('click', closeUploadModal);
-        document.getElementById('uploadBtn').addEventListener('click', submitTugas);
-        document.getElementById('fileUploadArea').addEventListener('click', () => {
-            document.getElementById('uploadFileInput').click();
-        });
-        document.getElementById('uploadFileInput').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                document.getElementById('uploadFileName').textContent = `✓ ${file.name}`;
+            if (!file) {
+                alert("❌ Pilih file terlebih dahulu!");
+                return;
             }
-        });
-        
-        document.getElementById('closeGrade').addEventListener('click', closeGradeModal);
-        document.getElementById('cancelGradeBtn').addEventListener('click', closeGradeModal);
-        document.getElementById('gradeBtn').addEventListener('click', submitGrade);
-        
-        document.getElementById('password').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') login();
-        });
 
-        console.log("✅ Ready!");
-    });
-</script>
+            const btn = document.getElementById('uploadBtn');
+            btn.disabled = true;
+            btn.textContent = "⏳ Uploading...";
+
+            try {
+                const { ref, set } = window.firebaseDB;
+                const db = window.firebaseDatabase;
+
+                const data = {
+                    nim: currentUser,
+                    nama: getStudentName(currentUser),
+                    fileName: file.name,
+                    fileSize: file.size,
+                    fileType: file.type,
+                    note: note,
+                    uploadedAt: new Date().toISOString()
+                };
+
+                await set(ref(db, `submissions/matkul_${currentMatkulIndex}/${currentUser}`), data);
+
+                document.getElementById('uploadSuccessMsg').style.display = 'block';
+                setTimeout(() => {
+                    closeUploadModal();
+                    loadStudentList();
+                }, 1500);
+
+            } catch (error) {
+                console.error("Error:", error);
+                alert("❌ Error: " + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "📤 Upload";
+            }
+        }
+
+        // GRADE MODAL
+        async function openGradeModal(nim) {
+            currentGradeNim = nim;
+            document.getElementById('gradeModal').style.display = 'block';
+            document.getElementById('gradeStudentNim').value = `${nim} - ${getStudentName(nim)}`;
+            document.getElementById('gradeSuccessMsg').style.display = 'none';
+
+            const { ref, get } = window.firebaseDB;
+            const db = window.firebaseDatabase;
+
+            const gradeRef = ref(db, `grades/matkul_${currentMatkulIndex}/${nim}`);
+            const snapshot = await get(gradeRef);
+
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                document.getElementById('gradeScore').value = data.score || '';
+                document.getElementById('gradeComment').value = data.comment || '';
+            } else {
+                document.getElementById('gradeScore').value = '';
+                document.getElementById('gradeComment').value = '';
+            }
+        }
+
+        function closeGradeModal() {
+            document.getElementById('gradeModal').style.display = 'none';
+        }
+
+        async function submitGrade() {
+            const score = document.getElementById('gradeScore').value;
+            const comment = document.getElementById('gradeComment').value;
+
+            if (!score) {
+                alert("❌ Masukkan nilai!");
+                return;
+            }
+
+            if (score < 0 || score > 100) {
+                alert("❌ Nilai harus antara 0-100!");
+                return;
+            }
+
+            const btn = document.getElementById('gradeBtn');
+            btn.disabled = true;
+            btn.textContent = "⏳ Saving...";
+
+            try {
+                const { ref, set } = window.firebaseDB;
+                const db = window.firebaseDatabase;
+
+                const data = {
+                    nim: currentGradeNim,
+                    nama: getStudentName(currentGradeNim),
+                    score: parseInt(score),
+                    comment: comment,
+                    gradedBy: currentUser,
+                    gradedByName: getStudentName(currentUser),
+                    gradedAt: new Date().toISOString()
+                };
+
+                await set(ref(db, `grades/matkul_${currentMatkulIndex}/${currentGradeNim}`), data);
+
+                document.getElementById('gradeSuccessMsg').style.display = 'block';
+                setTimeout(() => {
+                    closeGradeModal();
+                    loadStudentList();
+                }, 1500);
+
+            } catch (error) {
+                console.error("Error:", error);
+                alert("❌ Error: " + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "💾 Simpan";
+            }
+        }
+
+        // LOGOUT
+        function logout() {
+            if (confirm("Apakah Anda yakin ingin keluar?")) {
+                currentUser = "";
+                currentMatkulIndex = -1;
+                document.getElementById('loginPage').style.display = 'block';
+                document.getElementById('dashboardPage').style.display = 'none';
+                document.getElementById('studentListPage').style.display = 'none';
+                document.getElementById('nim').value = '';
+                document.getElementById('password').value = '';
+                console.log("✅ Logged out");
+            }
+        }
+
+        // EVENT LISTENERS
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('loginBtn').addEventListener('click', login);
+            document.getElementById('logoutBtn1').addEventListener('click', logout);
+            document.getElementById('logoutBtn2').addEventListener('click', logout);
+            document.getElementById('backBtn').addEventListener('click', backToDashboard);
+            
+            document.getElementById('closeUpload').addEventListener('click', closeUploadModal);
+            document.getElementById('cancelUploadBtn').addEventListener('click', closeUploadModal);
+            document.getElementById('uploadBtn').addEventListener('click', submitTugas);
+            document.getElementById('fileUploadArea').addEventListener('click', () => {
+                document.getElementById('uploadFileInput').click();
+            });
+            document.getElementById('uploadFileInput').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const sizeKB = (file.size / 1024).toFixed(2);
+                    document.getElementById('uploadFileName').textContent = `✓ ${file.name} (${sizeKB} KB)`;
+                }
+            });
+            
+            document.getElementById('closeGrade').addEventListener('click', closeGradeModal);
+            document.getElementById('cancelGradeBtn').addEventListener('click', closeGradeModal);
+            document.getElementById('gradeBtn').addEventListener('click', submitGrade);
+            
+            document.getElementById('password').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') login();
+            });
+
+            // Close modal when clicking outside
+            window.onclick = function(event) {
+                const uploadModal = document.getElementById('uploadModal');
+                const gradeModal = document.getElementById('gradeModal');
+                if (event.target === uploadModal) closeUploadModal();
+                if (event.target === gradeModal) closeGradeModal();
+            }
+
+            console.log("✅ Application ready!");
+        });
+    </script>
+</body>
+</html>
